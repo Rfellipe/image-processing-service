@@ -140,3 +140,7 @@ vite.config.ts.timestamp-*
 
 #Lock files
 *-lock*
+
+/generated/prisma
+
+/src/generated/prisma
