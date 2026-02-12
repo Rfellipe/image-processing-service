@@ -30,6 +30,11 @@ export class CatchAllFilter implements ExceptionFilter {
     const ctx = host.switchToHttp()
     let responseBody: ExceptionResponseBody = this.initResponseBody(ctx)
 
+    if (exception instanceof Error) {
+      /// TODO: Better error handling
+      console.log(exception)
+    }
+
     if (exception instanceof HttpException) {
       responseBody.message = exception.message
       responseBody.cause = responseBody.cause

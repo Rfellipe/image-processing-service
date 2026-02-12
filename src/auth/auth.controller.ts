@@ -2,7 +2,7 @@ import { Body, Controller, Post, UsePipes } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { RegisterSchema, type RegisterData } from './dtos/register.dto'
 import { ZodValidationPipe } from 'src/zod.pipe'
-import { type LoginData, LoginSchema } from './dtos/login.dto'
+import { type LoginData, LoginSchema, LoginResponse } from './dtos/login.dto'
 
 @Controller()
 export class AuthController {
@@ -22,7 +22,7 @@ export class AuthController {
   async login(
     @Body()
     userData: LoginData
-  ): Promise<string> {
+  ): Promise<LoginResponse> {
     return await this.authService.login(userData)
   }
 }
