@@ -4,6 +4,7 @@ import { type RegisterData } from './dtos/register.dto'
 import * as argon2 from 'argon2'
 import { LoginResponse, type LoginData } from './dtos/login.dto'
 import { JwtService } from '@nestjs/jwt'
+import { UserEntity } from './dtos/user.dto'
 
 @Injectable()
 export class AuthService {
@@ -50,7 +51,7 @@ export class AuthService {
 
       if (!isPasswordCorrect) throw this.returnBadReq()
 
-      const payload = {
+      const payload: UserEntity = {
         sub: user.id,
         email: user.email,
         createdAt: user.createdAt,
@@ -70,7 +71,6 @@ export class AuthService {
 
   private argon2Secret(): Buffer<ArrayBuffer> {
     const secret = process.env.ARGON_SECRET
-    if (!secret) throw new Error('NO ARGON_SECRET VAR SET')
     const encoder = new TextEncoder()
     const arrBuff = encoder.encode(secret)
 

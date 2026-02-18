@@ -141,6 +141,12 @@ vite.config.ts.timestamp-*
 #Lock files
 *-lock*
 
-/generated/prisma
-
+# Prisma
 /src/generated/prisma
+
+# wrangler project
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
+.wrangler/

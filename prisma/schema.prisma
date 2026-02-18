@@ -10,6 +10,11 @@ generator client {
   moduleFormat = "cjs"
 }
 
+generator json {
+  provider  = "prisma-json-types-generator"
+  namespace = "PrismaJson"
+}
+
 datasource db {
   provider = "postgresql"
 }
@@ -23,9 +28,13 @@ model Users {
 }
 
 model Images {
-  id       Int    @id @default(autoincrement())
-  url      String
-  metadata Json
-  usersId  String @db.Uuid
-  users    Users  @relation(fields: [usersId], references: [id])
+  id                Int      @id @default(autoincrement())
+  url               String
+  urlExpirationDate DateTime @db.Timestamptz()
+  /// [ImageMetadata]
+  metadata          Json
+  userId            String   @db.Uuid
+  user              Users    @relation(fields: [userId], references: [id])
+  createdAt         DateTime @default(now()) @db.Timestamptz()
+  updatedAt         DateTime @updatedAt @db.Timestamptz()
 }

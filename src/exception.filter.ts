@@ -28,26 +28,17 @@ export class CatchAllFilter implements ExceptionFilter {
     const { httpAdapter } = this.httpAdapterHost
 
     const ctx = host.switchToHttp()
-    let responseBody: ExceptionResponseBody = this.initResponseBody(ctx)
-
-    if (exception instanceof Error) {
-      /// TODO: Better error handling
-      console.log(exception)
-    }
+    const responseBody: ExceptionResponseBody = this.initResponseBody(ctx)
 
     if (exception instanceof HttpException) {
       responseBody.message = exception.message
       responseBody.cause = responseBody.cause
       responseBody.statusCode = exception.getStatus()
-    }
-
-    if (exception instanceof ZodError) {
+    } else if (exception instanceof ZodError) {
       responseBody.message = 'Error validating fields'
       responseBody.cause = z.treeifyError(exception)
       responseBody.statusCode = HttpStatus.BAD_REQUEST
-    }
-
-    if (exception instanceof PrismaClientKnownRequestError) {
+    } else if (exception instanceof PrismaClientKnownRequestError) {
       const message = this.handlePrismaErrorCode(exception.code)
       if (!message) {
         console.error(exception.code)
@@ -56,6 +47,10 @@ export class CatchAllFilter implements ExceptionFilter {
       }
 
       responseBody.cause = exception.cause
+      responseBody.statusCode = HttpStatus.INTERNAL_SERVER_ERROR
+    } else {
+      console.log(exception)
+      responseBody.message = 'Server error'
       responseBody.statusCode = HttpStatus.INTERNAL_SERVER_ERROR
     }
 
