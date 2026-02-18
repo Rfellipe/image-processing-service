@@ -10,3 +10,10 @@ export const ImageSchema = z
   .refine(f => ['image/png', 'image/jpeg'].includes(f.mimetype), {
     message: 'Only PNG or JPEG allowed',
   })
+
+export type ImageEntity = {
+  metadata: PrismaJson.ImageMetadata
+  id: number
+  url: string
+  urlExpirationDate: Date
+}

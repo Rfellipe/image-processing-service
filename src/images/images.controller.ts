@@ -14,10 +14,12 @@ import { ImagesService } from './images.service'
 import { AuthGuard } from 'src/auth/auth.guard'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ZodValidationPipe } from 'src/zod.pipe'
-import { ImageSchema } from './images.dtos'
+import { type ImageEntity, ImageSchema } from './images.dtos'
+import { ImageResponse } from 'src/storage/r2/r2.dtos'
 import { User } from 'src/auth/auth.decorator'
 import { type UserEntity } from 'src/auth/dtos/user.dto'
-import { ImageResponse } from 'src/storage/r2/r2.dtos'
+import { ImageGuard } from './images.guard'
+import { Image } from './image.decorator'
 
 @Controller('images')
 @UseGuards(AuthGuard)
@@ -26,6 +28,7 @@ export class ImagesController {
 
   @Get()
   getImages(
+    @User() user: UserEntity,
     @Query('page', ParseIntPipe) page?: number,
     @Query('limit', ParseIntPipe) limit?: number
   ): string {
@@ -41,16 +44,21 @@ export class ImagesController {
     return await this.imageService.uploadImages(file, user)
   }
 
-  @Put(':id')
-  updateImage(@Param('id', ParseIntPipe) id: number): string {
-    return this.imageService.updateImage()
+  @Put(':id/transform')
+  @UseGuards(ImageGuard)
+  async updateImage(
+    @Param('id', ParseIntPipe) _: number,
+    @Image() image: ImageEntity
+  ): Promise<string> {
+    return await this.imageService.updateImage(image)
   }
 
   @Get(':id')
+  @UseGuards(ImageGuard)
   async getImage(
-    @Param('id', ParseIntPipe) imageId: number,
-    @User() user: UserEntity
+    @Param('id', ParseIntPipe) _: number,
+    @Image() image: ImageEntity
   ): Promise<ImageResponse> {
-    return this.imageService.getImage(imageId, user)
+    return this.imageService.getImage(image)
   }
 }

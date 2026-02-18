@@ -1,14 +1,17 @@
 import { ForbiddenException, Injectable, Scope } from '@nestjs/common'
 import { UserEntity } from 'src/auth/dtos/user.dto'
+import { ImageProcessingService } from 'src/image-processing/image-processing.service'
 import { PrismaService } from 'src/prisma.service'
-import { ImageResponse } from 'src/storage/r2/r2.dtos'
 import { R2Service } from 'src/storage/r2/r2.service'
+import { ImageResponse } from 'src/storage/r2/r2.dtos'
+import { ImageEntity } from './images.dtos'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ImagesService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly r2: R2Service
+    private readonly r2: R2Service,
+    private readonly imageProcessing: ImageProcessingService
   ) {}
 
   getImages(page?: number, limit?: number): string {
@@ -31,27 +34,20 @@ export class ImagesService {
     }
   }
 
-  updateImage(): string {
+  async updateImage(image: ImageEntity): Promise<string> {
+    // const imageBody = await this.r2.getImageBody(image.metadata.path)
+    //
+    // await this.imageProcessing.resize()
+
     return 'Hello from PUT image/:id route'
   }
 
-  async getImage(imageId: number, user: UserEntity): Promise<ImageResponse> {
+  async getImage(image: ImageEntity): Promise<ImageResponse> {
     try {
       const currentDate = new Date()
-      const image = await this.prisma.images.findUnique({
-        where: { id: imageId, AND: { userId: user.sub } },
-        select: {
-          id: true,
-          url: true,
-          urlExpirationDate: true,
-          metadata: true,
-        },
-      })
-
-      if (!image) throw new ForbiddenException('Image not found')
 
       if (image.urlExpirationDate < currentDate) {
-        return this.r2.renewSignedUrl(imageId, image.metadata.path)
+        return this.r2.renewSignedUrl(image.id, image.metadata.path)
       }
 
       return {

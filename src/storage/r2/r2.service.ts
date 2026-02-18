@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import {
   DeleteObjectCommand,
   GetObjectCommand,
+  GetObjectCommandOutput,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3'
@@ -71,7 +72,9 @@ export class R2Service {
     }
   }
 
-  async downloadImage(filePath: string) {
+  async getImageBody(
+    filePath: string
+  ): Promise<GetObjectCommandOutput['Body']> {
     try {
       const test = await this.s3.send(
         new GetObjectCommand({
@@ -79,6 +82,13 @@ export class R2Service {
           Key: filePath,
         })
       )
+
+      if (!test.Body)
+        throw new InternalServerErrorException(
+          'Image object not found or corrupted, try uploading it again'
+        )
+
+      return test.Body
     } catch (error) {
       throw error
     }
