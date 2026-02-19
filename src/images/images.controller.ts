@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
   Param,
   ParseIntPipe,
@@ -16,7 +17,11 @@ import { ImagesService } from './images.service'
 import { AuthGuard } from 'src/auth/auth.guard'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { ZodValidationPipe } from 'src/zod.pipe'
-import { type ImageEntity, ImageSchema } from './images.dtos'
+import {
+  type ImageEntity,
+  ImageSchema,
+  PaginatedImagesResponse,
+} from './images.dtos'
 import { ImageResponse } from 'src/storage/r2/r2.dtos'
 import { User } from 'src/auth/auth.decorator'
 import { type UserEntity } from 'src/auth/dtos/user.dto'
@@ -33,12 +38,12 @@ export class ImagesController {
   constructor(private readonly imageService: ImagesService) {}
 
   @Get()
-  getImages(
+  async getImages(
     @User() user: UserEntity,
-    @Query('page', ParseIntPipe) page?: number,
-    @Query('limit', ParseIntPipe) limit?: number
-  ): string {
-    return this.imageService.getImages(page, limit)
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number
+  ): Promise<PaginatedImagesResponse> {
+    return await this.imageService.getImages(user, page, limit)
   }
 
   @UseInterceptors(FileInterceptor('file'))
