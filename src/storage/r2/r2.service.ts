@@ -11,6 +11,7 @@ import { StorePayload, ImageResponse } from './r2.dtos'
 import { PrismaService } from 'src/prisma.service'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client'
+import { Readable } from 'stream'
 
 @Injectable()
 export class R2Service {
@@ -72,23 +73,29 @@ export class R2Service {
     }
   }
 
-  async getImageBody(
-    filePath: string
-  ): Promise<GetObjectCommandOutput['Body']> {
+  async getImageBody(filePath: string): Promise<Buffer<ArrayBuffer>> {
     try {
-      const test = await this.s3.send(
+      const object = await this.s3.send(
         new GetObjectCommand({
           Bucket: this.Bucket,
           Key: filePath,
         })
       )
 
-      if (!test.Body)
+      if (!object.Body)
         throw new InternalServerErrorException(
           'Image object not found or corrupted, try uploading it again'
         )
 
-      return test.Body
+      const chunks: Buffer[] = []
+
+      for await (const chunk of object.Body as Readable) {
+        chunks.push(chunk)
+      }
+
+      const buffer = Buffer.concat(chunks)
+
+      return buffer
     } catch (error) {
       throw error
     }
