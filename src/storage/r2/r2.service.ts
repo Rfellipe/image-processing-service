@@ -8,7 +8,7 @@ import {
 } from '@aws-sdk/client-s3'
 import { ConfigService } from '@nestjs/config'
 import { StorePayload, ImageResponse } from './r2.dtos'
-import { PrismaService } from 'src/prisma.service'
+import { PrismaService } from 'src/general/prisma.service'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client'
 import { Readable } from 'stream'

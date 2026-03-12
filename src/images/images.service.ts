@@ -5,7 +5,7 @@ import { R2Service } from 'src/storage/r2/r2.service'
 import { ImageResponse } from 'src/storage/r2/r2.dtos'
 import { ImageEntity, PaginatedImagesResponse } from './images.dtos'
 import { ImageProcessingQuery } from 'src/image-processing/image-processing.dtos'
-import { PrismaService } from 'src/prisma.service'
+import { PrismaService } from 'src/general/prisma.service'
 
 @Injectable({ scope: Scope.REQUEST })
 export class ImagesService {

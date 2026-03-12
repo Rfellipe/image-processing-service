@@ -16,7 +16,7 @@ import {
 import { ImagesService } from './images.service'
 import { AuthGuard } from 'src/auth/auth.guard'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { ZodValidationPipe } from 'src/zod.pipe'
+import { ZodValidationPipe } from 'src/general/zod.pipe'
 import {
   type ImageEntity,
   ImageSchema,

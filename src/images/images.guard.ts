@@ -5,7 +5,7 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common'
-import { PrismaService } from 'src/prisma.service'
+import { PrismaService } from 'src/general/prisma.service'
 
 @Injectable()
 export class ImageGuard implements CanActivate {

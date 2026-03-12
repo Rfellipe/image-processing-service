@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { R2Service } from './r2.service'
-import { PrismaService } from 'src/prisma.service'
+import { PrismaService } from 'src/general/prisma.service'
 
 @Module({
   providers: [PrismaService, R2Service],

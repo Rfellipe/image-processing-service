@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
-import { PrismaService } from 'src/prisma.service'
+import { PrismaService } from 'src/general/prisma.service'
 import { type RegisterData } from './dtos/register.dto'
 import * as argon2 from 'argon2'
 import { LoginResponse, type LoginData } from './dtos/login.dto'

@@ -1,7 +1,7 @@
 import { Body, Controller, Post, UsePipes } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { RegisterSchema, type RegisterData } from './dtos/register.dto'
-import { ZodValidationPipe } from 'src/zod.pipe'
+import { ZodValidationPipe } from 'src/general/zod.pipe'
 import { type LoginData, LoginSchema, LoginResponse } from './dtos/login.dto'
 
 @Controller()
