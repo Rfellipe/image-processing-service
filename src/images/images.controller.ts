@@ -1,4 +1,9 @@
 import {
+  ApiBody,
+  ApiConsumes,
+  ApiParam,
+} from '@nestjs/swagger'
+import {
   Body,
   Controller,
   DefaultValuePipe,
@@ -48,6 +53,19 @@ export class ImagesController {
 
   @UseInterceptors(FileInterceptor('file'))
   @Post()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   async uploadImages(
     @UploadedFile(new ZodValidationPipe(ImageSchema)) file: Express.Multer.File,
     @User() user: UserEntity
@@ -58,6 +76,75 @@ export class ImagesController {
   @Put(':id/transform')
   @UseGuards(ImageGuard)
   @UsePipes(new ZodValidationPipe(ImageProcessingQuerySchema))
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'Image id',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['transformations'],
+      properties: {
+        transformations: {
+          type: 'object',
+          description: 'At least one transformation must be provided',
+          properties: {
+            resize: {
+              type: 'object',
+              properties: {
+                width: { type: 'integer', minimum: 1, maximum: 8192 },
+                height: { type: 'integer', minimum: 1, maximum: 8192 },
+                fit: {
+                  type: 'string',
+                  enum: ['cover', 'contain', 'fill', 'inside', 'outside'],
+                },
+              },
+            },
+            crop: {
+              type: 'object',
+              required: ['width', 'height', 'x', 'y'],
+              properties: {
+                width: { type: 'integer', minimum: 1, maximum: 8192 },
+                height: { type: 'integer', minimum: 1, maximum: 8192 },
+                x: { type: 'integer', minimum: 0 },
+                y: { type: 'integer', minimum: 0 },
+              },
+            },
+            rotate: { type: 'integer', minimum: -360, maximum: 360 },
+            flip: { type: 'boolean' },
+            mirror: { type: 'boolean' },
+            filters: {
+              type: 'object',
+              properties: {
+                grayscale: { type: 'boolean' },
+                sepia: { type: 'boolean' },
+              },
+            },
+            compress: {
+              type: 'object',
+              properties: {
+                quality: { type: 'integer', minimum: 1, maximum: 100 },
+              },
+            },
+            format: {
+              type: 'string',
+              enum: ['jpeg', 'png', 'webp', 'avif'],
+            },
+            watermark: {
+              type: 'object',
+              required: ['text'],
+              properties: {
+                text: { type: 'string', minLength: 1 },
+                fontSize: { type: 'integer', minimum: 8, maximum: 128 },
+                opacity: { type: 'integer', minimum: 0, maximum: 100 },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
   async updateImage(
     @Image() image: ImageEntity,
     @User() user: UserEntity,
